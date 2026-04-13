@@ -6,34 +6,120 @@
 # ==============================================
 
 clear
-echo "=============================================="
-echo "          🔥 BEM-VINDO AO ATITUDE BOX        "
-echo "             Versão Brasileira 🇧🇷           "
-echo "=============================================="https://raw.githubusercontent.com/SEU-NOME/ATITUDE-BR/main/installhttps://gitlab.com/api/v4/projects/$PROJECT_ID/repository/files/$1/raw?ref=main#!/data/data/com.termux/files/usr/bin/bash
-# =========================================
-# ⚡ INSTALADOR OFICIAL - ATITUDE BR
-# =========================================
-
-clear
 echo " █████╗ ██╗████████╗███████╗██████╗ "
 echo "██╔══██╗██║╚══██╔══╝██╔════╝██╔══██╗ "
 echo "███████║██║   ██║   █████╗  ██████╔╝ "
 echo "██╔══██║██║   ██║   ██╔══╝  ██╔══██╗ "
-echo "██║  ██║██║   ██║   ███████╗██║  ██║ "
+echo "██║  ██║██║   ██║   ███████║██║  ██║ "
 echo "╚═╝  ╚═╝╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝ "
 echo "                                         "
 echo "          🇧🇷 INICIANDO INSTALAÇÃO 🇧🇷    "
+echo "=============================================="
 
-pkg update -y
-pkg install -y x11-repo pulseaudio wget termux-x11-nightly
+# ==============================================
+# ✨ PERMISSÕES E PREPARAÇÃO
+# ==============================================
+echo "📂 Solicitando permissão de armazenamento..."
+termux-setup-storage
 
-echo "📥 Baixando sistema base..."
-# Aqui vai o comando de baixar o glibc e wine
-# (Você já sabe o código que deu certo)
+sleep 3
 
-echo "🔧 Criando comando principal..."
-# (Aqui ele copia o arquivo 'atitude' para a pasta bin)
+if [ -d ~/storage/shared ]; then
+  echo "✅ Permissão concedida!"
+else
+  echo "❌ Erro! Rode novamente e permita."
+  exit 1
+fi
 
+# ==============================================
+# 📦 INSTALANDO DEPENDÊNCIAS
+# ==============================================
+echo ""
+echo "📦 Instalando componentes base..."
+apt-get clean
+apt-get update -y >/dev/null 2>&1
+apt-get upgrade -y >/dev/null 2>&1
+
+pkg install x11-repo pulseaudio wget tsu root-repo patchelf p7zip termux-x11-nightly -y &>/dev/null
+
+# Limpa versão anterior
+if [ -e $PREFIX/glibc ]; then
+  echo ""
+  echo "🗑️  Removendo versão anterior..."
+  rm -rf $PREFIX/glibc
+fi
+
+# ==============================================
+# ⚙️  MENU DE ESCOLHA
+# ==============================================
+echo ""
+echo "⚙️  CONFIGURAÇÃO DO ATITUDE BOX"
+echo "----------------------------------------"
+echo "Escolha a versão para instalar:"
+echo "1) Versão Estável"
+echo "2) Versão Nova (WOW64 - Recomendada)"
+echo ""
+read -p "Digite o número da opção: " i
+
+INSTALL_WOW64=0
+if [ "$i" = "2" ]; then
+  INSTALL_WOW64=1
+fi
+
+# ==============================================
+# ⬇️  DOWNLOAD E INSTALAÇÃO
+# ==============================================
+echo ""
+echo "⬇️  Baixando núcleo do sistema..."
+echo "⚠️  ISSO VAI DEMORAR! DEIXE TRABALHAR! ⚠️"
+echo ""
+
+# Função de download
+wget-git-q() {
+  wget -q --retry-connrefused --tries=0 "https://gitlab.com/api/v4/projects/$1/repository/files/$2/raw?ref=main" -O $3
+}
+
+# Define IDs dos projetos
+if [ "$INSTALL_WOW64" = "1" ]; then
+  PROJECT_ID=54240888
+else
+  PROJECT_ID=52465323
+fi
+
+mkdir -p $PREFIX/glibc/opt/package-manager
+echo "$PROJECT_ID" > $PREFIX/glibc/opt/package-manager/token
+
+# Baixa e executa o gerenciador
+wget-git-q $PROJECT_ID "package-manager" "$PREFIX/glibc/opt/package-manager/package-manager"
+chmod +x "$PREFIX/glibc/opt/package-manager/package-manager"
+. $PREFIX/glibc/opt/package-manager/package-manager
+
+sync-all
+
+if [ "$INSTALL_WOW64" = "1" ]; then
+  sync-package wine-9.3-vanilla-wow64
+else
+  sync-package wine-ge-custom-8-25
+fi
+
+# ==============================================
+# ✅ CRIA O ATALHO FINAL
+# ==============================================
+echo "🔗 Criando atalho..."
+mkdir -p $PREFIX/bin
+cp -f $PREFIX/glibc/opt/scripts/mobox $PREFIX/bin/atitudebox
+chmod +x $PREFIX/bin/atitudebox
+
+echo ""
+echo "✅ =============================================="
+echo "✅  INSTALAÇÃO CONCLUÍDA COM SUCESSO! 🇧🇷      "
+echo "✅                                             "
+echo "✅  Para iniciar o emulador, digite:           "
+echo "✅             atitudebox                      "
+echo "✅                                             "
+echo "✅  Não é só emular, é ter ATITUDE! 🚀💪      "
+echo "✅ ============================================="
+echo ""
 echo ""
 echo "✅ INSTALAÇÃO CONCLUÍDA!"
 echo "🚀 DIGITE: atitude"
