@@ -1,3 +1,59 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+# =========================================
+# 🇧🇷 ATITUDE BOX - COMPONENTE EXTRA
+# ✅ ADICIONA DISCO D: E ACESSO A DOWNLOADS
+# =========================================
+
+clear
+echo " █████╗ ██╗████████╗███████╗██████╗ "
+echo "██╔══██╗██║╚══██╔══╝██╔════╝██╔══██╗ "
+echo "███████║██║   ██║   █████╗  ██████╔╝ "
+echo "██╔══██║██║   ██║   ██╔══╝  ██╔══██╗ "
+echo "██║  ██║██║   ██║   ███████║██║  ██║ "
+echo "╚═╝  ╚═╝╚═╝   ╚═╝   ╚══════╝╚═╝  ⚡"
+echo "                                                              "
+echo "       📂 ADICIONANDO DISCO D: E ACESSO AOS ARQUIVOS 📂      "
+
+# Cria o novo inicializador com os discos
+cat > $PREFIX/bin/atitudebox << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+
+clear
+echo " █████╗ ██╗████████╗███████╗██████╗ "
+echo "██╔══██╗██║╚══██╔══╝██╔════╝██╔══██╗ "
+echo "███████║██║   ██║   █████╗  ██████╔╝ "
+echo "██╔══██║██║   ██║   ██╔══╝  ██╔══██╗ "
+echo "██║  ██║██║   ██║   ███████║██║  ██║ "
+echo "╚═╝  ╚═╝╚═╝   ╚═╝   ╚══════╝╚═╝  ⚡"
+echo "          🇧🇷 SISTEMA ATITUDE BR 🇧🇷     "
+
+termux-x11 :0 &
+export DISPLAY=:0
+export PULSE_SERVER=127.0.0.1
+export WINEDEBUG=-all
+pulseaudio --start --exit-idle-time=-1
+
+# 👇 AQUI ESTÁ A MAGIA DOS DISCOS 👇
+pr --bind $PREFIX/glibc / \
+   --bind /sdcard/Download /d \
+   --bind /sdcard /sdcard \
+   --bind / /host \
+   wine explorer /desktop=ATITUDE-BR,1280x720
+EOF
+
+chmod +x $PREFIX/bin/atitudebox
+
+echo ""
+echo "✅ =============================================="
+echo "✅  DISCOS CONFIGURADOS COM SUCESSO! 🇧🇷      "
+echo "✅                                             "
+echo "✅  Agora ao iniciar, terá:                     "
+echo "✅  💽 C: | 💾 D: (Downloads) | 📁 Z:         "
+echo "✅                                             "
+echo "✅  Digite: atitudebox                         "
+echo "✅ ============================================="
+echo ""se quiser mais recursos ative esse código aqui se quiser mais recurso se quiser o disco os discos do sistema é opcional
 #!/bin/bash
 
 # ==============================================
